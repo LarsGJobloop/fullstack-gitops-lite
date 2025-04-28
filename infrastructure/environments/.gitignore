@@ -1,0 +1,5 @@
+# Dependencies
+.terraform
+
+# Sensitive information
+*.tfvars*
