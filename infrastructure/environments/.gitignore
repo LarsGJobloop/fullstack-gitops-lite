@@ -3,3 +3,4 @@
 
 # Sensitive information
 *.tfvars*
+*.tfstate*

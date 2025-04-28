@@ -15,7 +15,7 @@ variable "instance_type" {
 
 variable "network_id" {
   description = "The network configuration to pass in"
-  type        = number
+  type        = string
 }
 
 variable "network_ip" {

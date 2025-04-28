@@ -15,7 +15,7 @@ variable "instance_type" {
 
 variable "network_id" {
   description = "The network configuration to pass in"
-  type        = number
+  type        = string
 }
 
 variable "network_ip" {
@@ -23,15 +23,14 @@ variable "network_ip" {
   type        = string
 }
 
-variable "git_repository" {
-  description = "Git repository to source compose file from"
+variable "compose_url" {
+  description = "Address of the Docker compose file to use"
   type        = string
   nullable    = false
 }
 
-variable "git_access_token" {
-  sensitive   = true
-  description = "Optional for private Git repositories. With, at least, content read right"
-  type        = string
+variable "labels" {
+  description = "Labels to annotate the server with"
+  type        = map(string)
   nullable    = true
 }

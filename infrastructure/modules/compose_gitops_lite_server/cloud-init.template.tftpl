@@ -1,0 +1,35 @@
+#cloud-config
+hostname: my-debian-server
+fqdn: my-debian-server.example.com
+
+users:
+  - name: debian
+    groups: sudo
+    shell: /bin/bash
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - cron
+
+runcmd:
+  # Install Docker
+  - curl -fsSL https://get.docker.com | sh
+  # Create application directory
+  - mkdir -p /opt/app
+  # Fetch the compose file from the web
+  - curl -o /opt/app/docker-compose.yaml ${compose_url}
+  # Start the Docker Compose app
+  - docker compose -f /opt/app/docker-compose.yaml up -d
+  # Set up a cron job to recreate the containers every hour
+  - |
+    echo "0 * * * * root docker compose -f /opt/app/docker-compose.yaml pull && docker compose -f /opt/app/docker-compose.yaml up -d" > /etc/cron.d/docker-compose-refresh
+    chmod 0644 /etc/cron.d/docker-compose-refresh
+    systemctl restart cron
+
+final_message: "Docker Compose app deployed and refresh cronjob installed."
