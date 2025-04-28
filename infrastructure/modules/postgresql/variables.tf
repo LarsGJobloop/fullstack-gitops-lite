@@ -18,7 +18,14 @@ variable "network_id" {
   type        = string
 }
 
-variable "network_ip" {
-  description = "The network configuration to pass in"
+variable "hostname" {
+  description = "Hostname to use for server"
   type        = string
+  nullable    = false
+}
+
+variable "labels" {
+  description = "Labels to annotate the server with"
+  type        = map(string)
+  nullable    = true
 }

@@ -13,10 +13,12 @@ resource "hcloud_server" "server" {
   server_type = var.instance_type
   location    = var.location
 
-  ssh_keys = []
-  user_data = templatefile("${path.module}/cloud-init.template.tftpl", {
-    ssh_public_key = file("${path.module}/id_rsa.pub")
-    compose_url    = var.compose_url
+  user_data = templatefile("${path.module}/cloud-init.tftpl", {
+    ssh_public_key   = file("${path.root}/id_rsa.pub")
+    compose_url      = var.compose_url
+    refresh_interval = var.refresh_interval
+    hostname         = var.hostname
+    server_fqdn      = var.server_fqdn != null ? var.server_fqdn : "${var.name}.internal"
   })
 
   labels = var.labels
@@ -28,6 +30,5 @@ resource "hcloud_server" "server" {
 
   network {
     network_id = var.network_id
-    ip         = var.network_ip
   }
 }

@@ -10,10 +10,12 @@ module "compose_server" {
   name          = "fullstack-gitops-lite"
   location      = "hel1"
   instance_type = "cax11"
-  compose_url   = "https://gituhb.com/larsgjobloop/fullstack-gitops-lite/manifest/compose.yaml"
+  hostname      = "services"
+
+  compose_url      = "https://raw.githubusercontent.com/LarsGJobloop/fullstack-gitops-lite/refs/heads/main/manifests/compose.yaml"
+  refresh_interval = "*/30 * * * *"
 
   network_id = hcloud_network.private_network.id
-  network_ip = "10.0.1.1"
 
   labels = {
     role = "services"
@@ -27,7 +29,13 @@ module "postgresql" {
   name          = "fullstack-gitops-lite"
   location      = "hel1"
   instance_type = "cax11"
+  hostname      = "postgresql"
+
+  labels = {
+    role = "storage"
+  }
 
   network_id = hcloud_network.private_network.id
-  network_ip = "10.0.1.2"
+
+  depends_on = [hcloud_network_subnet.subnet]
 }
