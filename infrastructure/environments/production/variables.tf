@@ -5,9 +5,8 @@ variable "hetzner_token" {
   nullable    = false
 }
 
-variable "git_access_token" {
-  sensitive   = true
-  description = "Optional for private Git repositories. With, at least, content read right"
+variable "postgres_password" {
+  description = "Password for the PostgreSQL 'postgres' user"
   type        = string
-  nullable    = true
+  sensitive   = true
 }

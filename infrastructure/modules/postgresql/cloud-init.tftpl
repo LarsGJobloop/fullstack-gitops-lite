@@ -1,0 +1,59 @@
+#cloud-config
+hostname: ${hostname}
+fqdn: ${server_fqdn}
+
+users:
+  - name: debian
+    groups: sudo
+    shell: /bin/bash
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+write_files:
+  # Write the PostgreSQL configuration
+  - path: "/etc/postgresql/15/main/postgresql.conf"
+    source:
+      uri: "${config_address}"
+    owner: postgres:postgres
+    permissions: "0o444" # Read only since it's sourced from here
+    encoding: text/plain
+    append: false
+    defer: true
+
+package_update: true
+package_upgrade: true
+# packages:
+#   - ufw
+
+runcmd:
+  # Relax password aging policy globally (for system users at least)
+  - sed -i 's/ENCRYPT_METHOD SHA512/ENCRYPT_METHOD SHA512\nPASS_MAX_DAYS 99999\nPASS_MIN_DAYS 0\nPASS_WARN_AGE 7/' /etc/login.defs
+  - passwd -l root # Lock root account again for safety
+  - passwd -u debian # Make sure our main user is okay
+
+  # Format the volume if necessary
+  - if [ ! -e /dev/disk/by-id/scsi-0HC_Volume_${volume_id} ]; then mkfs.ext4 /dev/disk/by-id/scsi-0HC_Volume_${volume_id}; fi
+
+  # Mount volume
+  - mkdir -p /var/lib/postgresql
+  - mount /dev/disk/by-id/scsi-0HC_Volume_${volume_id} /var/lib/postgresql
+  - echo '/dev/disk/by-id/scsi-0HC_Volume_${volume_id} /var/lib/postgresql ext4 defaults,nofail 0 2' >> /etc/fstab
+
+  # Install PostgreSQL manually AFTER volume is ready
+  - apt-get update
+  - apt-get install -y postgresql
+
+  # Fix permissions
+  - chown -R postgres:postgres /var/lib/postgresql
+
+  # Start PostgreSQL
+  - systemctl enable postgresql
+  - systemctl restart postgresql
+
+  # Set PostgreSQL password
+  - sudo -u postgres psql -c "ALTER USER postgres PASSWORD '${postgres_password}';"
+
+  # Open firewall
+  # - ufw allow 5432/tcp
+  # - ufw enable

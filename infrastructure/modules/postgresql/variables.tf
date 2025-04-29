@@ -29,3 +29,15 @@ variable "labels" {
   type        = map(string)
   nullable    = true
 }
+
+variable "postgres_password" {
+  description = "Password for the PostgreSQL 'postgres' user"
+  type        = string
+  sensitive   = true
+}
+
+variable "data_delete_protection" {
+  description = "Extra protection for the data volume"
+  type        = bool
+  default     = false
+}

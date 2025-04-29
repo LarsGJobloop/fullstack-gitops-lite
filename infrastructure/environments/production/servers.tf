@@ -25,11 +25,13 @@ module "compose_server" {
 }
 
 module "postgresql" {
-  source        = "../../modules/postgresql"
-  name          = "fullstack-gitops-lite"
-  location      = "hel1"
-  instance_type = "cax11"
-  hostname      = "postgresql"
+  source                 = "../../modules/postgresql"
+  name                   = "fullstack-gitops-lite"
+  location               = "hel1"
+  instance_type          = "cax11"
+  hostname               = "postgresql"
+  postgres_password      = var.postgres_password
+  data_delete_protection = false
 
   labels = {
     role = "storage"
