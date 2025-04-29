@@ -30,5 +30,6 @@ resource "hcloud_server" "server" {
 
   network {
     network_id = var.network_id
+    alias_ips  = [] # Fixes https://github.com/hetznercloud/terraform-provider-hcloud/issues/650
   }
 }
